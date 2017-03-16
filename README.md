@@ -11,5 +11,7 @@ A 3D simulation of the brownian motion for my physics undergraduate class.
 
 Soon to be added
 
+
 **Quazi Hossain**
+
 q.hossain@ymail.com
