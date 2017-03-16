@@ -1,4 +1,4 @@
-### Improvements:
+### TODO List:
 
 - Use octree data structure to detect collision
 - Add a tracer line for the big sphere (eyeCandy)
