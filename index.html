@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Brownian Motion 3D</title>
+    </head>
+    <body style="margin:0">
+        <script type="text/javascript" src="js/three.min.js"></script>
+        <script type="text/javascript" src="js/OrbitControls.js"></script>
+        <script type="text/javascript" src="js/Detector.js"></script>
+        <script type="text/javascript" src="js/stats.min.js"></script>
+        <script type="text/javascript" src="js/THREEx.WindowResize.js"></script>
+        <script type="text/javascript" src="js/THREEx.FullScreen.js"></script>
+        <script type="text/javascript" src="js/dat.gui.min.js"></script>
+        <script type="text/javascript">
+            var camera, controls, scene, renderer;
+            var container, stats, GUI;
+
+            var DIMENSIONS = 200;
+
+            var SPHERE_RADIUS = 2;
+            var amountOfSpheres = 50;
+            var balls = [];
+
+            var EYE_CANDY_RADIUS = 8;
+            var amountOfEyeCandies = 1;
+            var eyeCandies = [];
+
+            if(Detector.webgl) {
+                initGraphics();
+                animate();
+            } else {
+                var warning = Detector.getWebGLErrorMessage();
+                document.getElementById('container').appendChild(warning);
+            }
+
+            function initGraphics() {
+                container = document.createElement('div');
+                document.body.appendChild(container);
+
+                //CAMERA
+                camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+                camera.position.z = 500;
+
+                //CONTROLS
+                controls = new THREE.OrbitControls(camera, container);
+                controls.noZoom = true;
+                controls.noPan = true;
+                controls.noRotate = false;
+                controls.addEventListener('change', render);
+
+                //SCENE
+                scene = new THREE.Scene();
+                scene.add(createCube());
+                for(var i = 0; i < amountOfSpheres; i++) {
+                    scene.add(createSphere());
+                }
+                for(var k = 0; k < amountOfEyeCandies; k++) {
+                    scene.add(eyeCandy());
+                }
+
+                //RENDERER
+                renderer = new THREE.WebGLRenderer({alpha: false});
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+
+                //EVENTS
+                THREEx.WindowResize(renderer, camera);
+                THREEx.FullScreen.bindKey({ //only works on chrome and firefox
+                    charCode: 'm'.charCodeAt(0)
+                });
+
+                //KEYBOARD EVENTS
+                document.addEventListener('keydown', keyboardEvents, false);
+
+                container.appendChild(renderer.domElement);
+                stats = new Stats();
+                container.appendChild(stats.dom);
+
+                //GUI
+                displayGUI();
+            }
+
+            // Creating a cube with a set dimension
+            function createCube() {
+                var geometry = new THREE.CubeGeometry(DIMENSIONS, DIMENSIONS, DIMENSIONS);
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0x000000,
+                    wireframe: true
+                });
+                var mesh = new THREE.Mesh(geometry, material);
+                var cube;
+                cube = new THREE.BoxHelper(mesh, 0xffffff);
+                return cube;
+            }
+
+            //Creates a sphere with a random position and a random velocity with a set radius
+            function createSphere() {
+                var geometry = new THREE.SphereGeometry(SPHERE_RADIUS, 32, 32);
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0x0000ff
+                });
+                var mesh = new THREE.Mesh(geometry, material);
+
+                mesh.position.set((Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2),
+                                  (Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2),
+                                  (Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2));
+                mesh.velocity = new THREE.Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
+
+                balls.push(mesh);
+                return mesh;
+            }
+
+            //Creates a big sphere with a random position and a random velocity with a set radius (big sphere is set to have the same mass as the smaller spheres)
+            function eyeCandy() {
+                var geometry = new THREE.SphereGeometry(EYE_CANDY_RADIUS, 32, 32);
+                var material = new THREE.MeshBasicMaterial({
+                    color: 0xff0000
+                });
+                var mesh = new THREE.Mesh(geometry, material);
+
+                mesh.position.set((Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2),
+                                  (Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2),
+                                  (Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2));
+                mesh.velocity = new THREE.Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
+
+                eyeCandies.push(mesh);
+                return mesh;
+            }
+
+            //Check to see if the position of the ball doesn't go past the wall and also check to see if it's velocity is less than or greater than 0 so it doesn't spike past and get stuck by the edge of the wall
+            function checkWallBoundaries(current) {
+                if((current.position.x >= (DIMENSIONS / 2 - current.geometry.parameters.radius) && current.velocity.x > 0) || (current.position.x <= (-DIMENSIONS / 2 + current.geometry.parameters.radius) && current.velocity.x < 0))
+                    current.velocity.setX(-current.velocity.x);
+
+                if((current.position.y >= (DIMENSIONS / 2 - current.geometry.parameters.radius) && current.velocity.y > 0) || (current.position.y <= (-DIMENSIONS / 2 + current.geometry.parameters.radius) && current.velocity.y < 0))
+                    current.velocity.setY(-current.velocity.y);
+
+                if((current.position.z >= (DIMENSIONS / 2 - current.geometry.parameters.radius) && current.velocity.z > 0) || (current.position.z <= (-DIMENSIONS / 2 + current.geometry.parameters.radius) && current.velocity.z < 0))
+                    current.velocity.setZ(-current.velocity.z);
+            }
+
+            //Check to see if the spheres intesects with each other
+            function intersects(sphere, other) {
+                var x1 = sphere.position.x;
+                var x2 = other.position.x;
+
+                var y1 = sphere.position.y;
+                var y2 = other.position.y;
+
+                var z1 = sphere.position.z;
+                var z2 = other.position.z;
+
+                if ((x1 - x2) >= (sphere.geometry.parameters.radius + other.geometry.parameters.radius) || (y1 - y2) >= (sphere.geometry.parameters.radius + other.geometry.parameters.radius) || (z1 - z2) >= (sphere.geometry.parameters.radius + other.geometry.parameters.radius))
+                    return false;
+
+                var distance = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
+
+                return (distance < (sphere.geometry.parameters.radius + other.geometry.parameters.radius));
+            }
+
+            //Look for any collision between spheres; if there are any swap their velocity
+            function checkSphereCollision(current) {
+                for(var i = current + 1; i < balls.length; i++) {
+                    if(intersects(balls[current], balls[i])) {
+                        var temp = balls[current].velocity;
+                        var temp2 = balls[i].velocity;
+                        balls[i].velocity = temp;
+                        balls[current].velocity = temp2;
+                    }
+                }
+            }
+
+            //Look for any collision between sphere and big sphere; if there are any swap their velocity
+            function checkCandyCollision(current) {
+                for(var i = 0; i < eyeCandies.length; i++) {
+                    if(intersects(balls[current], eyeCandies[i])) {
+                        var temp = balls[current].velocity;
+                        var temp2 = eyeCandies[i].velocity;
+                        eyeCandies[i].velocity = temp;
+                        balls[current].velocity = temp2;
+                    }
+                }
+            }
+
+            //Displays a GUI with controls to toggle the visibility and color of the spheres
+            function displayGUI(){
+                GUI = new dat.GUI();
+                var param = {
+                    controls: function() {
+                        alert("H: Hides the controller" + "\n" + "Z: Enables and disables zoom" + "\n" + "P: Enables and disables pan" + "\n" + "R: Enables and disables rotation" + "\n" + "M: Enables FullScreen");
+                    },
+                    candyVisible: true,
+                    candyColor: "#ff0000",
+                    spheresVisible: true,
+                    spheresColor: "#0000ff"
+                };
+
+                GUI.add(param, 'controls').name("Key Controls");
+
+                var candy = GUI.addFolder("Bigger Particle");
+                var visibleCandy = candy.add(param, 'candyVisible').name("Visible");
+                visibleCandy.onChange(function (value) {
+                    for(var i = 0; i < eyeCandies.length; i++) {
+                        eyeCandies[i].visible = value;
+                    }
+                });
+                var colorCandy = candy.addColor(param, 'candyColor').name("Color");
+                colorCandy.onChange(function (value) {
+                    for(var i = 0; i < eyeCandies.length; i++) {
+                        eyeCandies[i].material.color.setHex(value.replace("#", "0x"));
+                    }
+                });
+                candy.open();
+
+                var sphere = GUI.addFolder("Smaller Particles");
+                var visibleSphere = sphere.add(param, 'spheresVisible').name("Visible");
+                visibleSphere.onChange(function (value) {
+                    for(var i = 0; i < balls.length; i++) {
+                        balls[i].visible = value;
+                    }
+                });
+                var colorSphere = sphere.addColor(param, 'spheresColor').name("Color");
+                colorSphere.onChange(function (value) {
+                    for(var i = 0; i < balls.length; i++) {
+                        balls[i].material.color.setHex(value.replace("#", "0x"));
+                    }
+                });
+                sphere.open();
+
+                GUI.open();
+            }
+
+            //Add keyboard events
+            function keyboardEvents(){
+                if(event.keyCode === 81) //letter Q toggles visibility of smaller spheres
+                    for(var i = 0; i < balls.length; i++)
+                        balls[i].visible = !balls[i].visible;
+
+                if(event.keyCode === 87) //letter W toggles visibility of bigger sphere
+                    for(var k = 0; k < eyeCandies.length; k++)
+                        eyeCandies[k].visible = !eyeCandies[k].visible;
+
+                if(event.keyCode === 90) //letter Z toggles zoom
+                    controls.noZoom = !controls.noZoom;
+
+                if(event.keyCode === 80) //letter P toggles panning
+                    controls.noPan = !controls.noPan;
+
+                if(event.keyCode === 82) //letter R toggles rotation
+                    controls.noRotate = !controls.noRotate;
+            }
+
+            function animate() {
+                //goes through every ball and checks for wall boundaries and collision
+                for(var i = 0; i < balls.length; i++) {
+                    balls[i].position.add(balls[i].velocity);
+                    checkWallBoundaries(balls[i]);
+                    checkSphereCollision(i);
+                    checkCandyCollision(i);
+                }
+
+                //checks to see if the big sphere collided with the wall
+                for(var k = 0; k < eyeCandies.length; k++) {
+                    eyeCandies[k].position.add(eyeCandies[k].velocity);
+                    checkWallBoundaries(eyeCandies[k]);
+                }
+
+                requestAnimationFrame(animate);
+                renderer.render(scene, camera);
+
+                controls.update();
+                stats.update();
+            }
+
+            function render() {
+                renderer.clear();
+                renderer.render(scene, camera);
+            }
+        </script>
+    </body>
+</html>
