@@ -16,7 +16,7 @@
             var camera, controls, scene, renderer;
             var container, stats, GUI;
 
-            var DIMENSIONS = 200;
+            var DIMENSIONS = 500;
 
             var SPHERE_RADIUS = 2;
             var amountOfSpheres = 50;
@@ -40,9 +40,9 @@
 
                 //CAMERA
                 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
-                camera.position.z = 500;
+                camera.position.z = DIMENSIONS * 2.5;
 
-                //CONTROLS
+                //CONTROLS THE CAMERA
                 controls = new THREE.OrbitControls(camera, container);
                 controls.noZoom = true;
                 controls.noPan = true;
