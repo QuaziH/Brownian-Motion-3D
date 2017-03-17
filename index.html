@@ -18,11 +18,11 @@
 
             var DIMENSIONS = 200;
 
-            var SPHERE_RADIUS = 2;
+            var SPHERE_RADIUS = 2.0;
             var amountOfSpheres = 500;
             var balls = [];
 
-            var EYE_CANDY_RADIUS = 8;
+            var EYE_CANDY_RADIUS = 8.0;
             var amountOfEyeCandies = 1;
             var eyeCandies = [];
 
@@ -122,7 +122,7 @@
                 mesh.position.set((Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2),
                                   (Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2),
                                   (Math.random() - 0.5) * (DIMENSIONS - geometry.parameters.radius*2));
-                mesh.velocity = new THREE.Vector3((Math.random() * 2) - 1, (Math.random() * 2) - 1, (Math.random() * 2) - 1);
+                mesh.velocity = new THREE.Vector3(0, 0, 0);
 
                 eyeCandies.push(mesh);
                 return mesh;
@@ -130,17 +130,17 @@
 
             //Check to see if the position of the ball doesn't go past the wall and also check to see if it's velocity is less than or greater than 0 so it doesn't spike past and get stuck by the edge of the wall
             function checkWallBoundaries(current) {
-                if((current.position.x >= (DIMENSIONS / 2 - current.geometry.parameters.radius) && current.velocity.x > 0) || (current.position.x <= (-DIMENSIONS / 2 + current.geometry.parameters.radius) && current.velocity.x < 0))
+                if(current.position.x >= DIMENSIONS / 2 - current.geometry.parameters.radius && current.velocity.x > 0 || current.position.x <= -DIMENSIONS / 2 + current.geometry.parameters.radius && current.velocity.x < 0)
                     current.velocity.setX(-current.velocity.x);
 
-                if((current.position.y >= (DIMENSIONS / 2 - current.geometry.parameters.radius) && current.velocity.y > 0) || (current.position.y <= (-DIMENSIONS / 2 + current.geometry.parameters.radius) && current.velocity.y < 0))
+                if(current.position.y >= DIMENSIONS / 2 - current.geometry.parameters.radius && current.velocity.y > 0 || current.position.y <= -DIMENSIONS / 2 + current.geometry.parameters.radius && current.velocity.y < 0)
                     current.velocity.setY(-current.velocity.y);
 
-                if((current.position.z >= (DIMENSIONS / 2 - current.geometry.parameters.radius) && current.velocity.z > 0) || (current.position.z <= (-DIMENSIONS / 2 + current.geometry.parameters.radius) && current.velocity.z < 0))
+                if(current.position.z >= DIMENSIONS / 2 - current.geometry.parameters.radius && current.velocity.z > 0 || current.position.z <= -DIMENSIONS / 2 + current.geometry.parameters.radius && current.velocity.z < 0)
                     current.velocity.setZ(-current.velocity.z);
             }
 
-            //Check to see if the spheres intesects with each other
+            //Check to see if the spheres intersects with each other
             function intersects(sphere, other) {
                 var x1 = sphere.position.x;
                 var x2 = other.position.x;
@@ -159,26 +159,48 @@
                 return (distance < (sphere.geometry.parameters.radius + other.geometry.parameters.radius));
             }
 
-            //Look for any collision between spheres; if there are any swap their velocity
+            //Look for any collision between spheres; if there are any, swap their velocity
             function checkSphereCollision(current) {
                 for(var i = current + 1; i < balls.length; i++) {
                     if(intersects(balls[current], balls[i])) {
-                        var temp = balls[current].velocity;
-                        var temp2 = balls[i].velocity;
-                        balls[i].velocity = temp;
-                        balls[current].velocity = temp2;
+                        //Used elastic head-on collision formula
+                        //v1 = (v1*(m1-m2))/(m1+m2) + (2*v2*m2)/(m1+m2)
+                        //v2 = (2*v1*m1)/(m1+m2) - (v2*(m1-m2))/(m1+m2)
+                        var bVelx = (balls[current].velocity.x * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS) + (2 * SPHERE_RADIUS * balls[i].velocity.x) / (SPHERE_RADIUS + SPHERE_RADIUS);
+                        var bVely = (balls[current].velocity.y * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS) + (2 * SPHERE_RADIUS * balls[i].velocity.y) / (SPHERE_RADIUS + SPHERE_RADIUS);
+                        var bVelz = (balls[current].velocity.z * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS) + (2 * SPHERE_RADIUS * balls[i].velocity.z) / (SPHERE_RADIUS + SPHERE_RADIUS);
+                        var b2Velx = (2 * balls[current].velocity.x * SPHERE_RADIUS) / (SPHERE_RADIUS + SPHERE_RADIUS) - (balls[i].velocity.x * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS);
+                        var b2Vely = (2 * balls[current].velocity.y * SPHERE_RADIUS) / (SPHERE_RADIUS + SPHERE_RADIUS) - (balls[i].velocity.y * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS);
+                        var b2Velz = (2 * balls[current].velocity.z * SPHERE_RADIUS) / (SPHERE_RADIUS + SPHERE_RADIUS) - (balls[i].velocity.z * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS);
+                        balls[current].velocity.x = bVelx;
+                        balls[current].velocity.y = bVely;
+                        balls[current].velocity.z = bVelz;
+                        balls[i].velocity.x = b2Velx;
+                        balls[i].velocity.y = b2Vely;
+                        balls[i].velocity.z = b2Velz;
                     }
                 }
             }
 
-            //Look for any collision between sphere and big sphere; if there are any swap their velocity
+            //Look for any collision between sphere and big sphere
             function checkCandyCollision(current) {
                 for(var i = 0; i < eyeCandies.length; i++) {
                     if(intersects(balls[current], eyeCandies[i])) {
-                        var temp = balls[current].velocity;
-                        var temp2 = eyeCandies[i].velocity;
-                        eyeCandies[i].velocity = temp;
-                        balls[current].velocity = temp2;
+                        //Used elastic head-on collision formula
+                        //v1 = (v1*(m1-m2))/(m1+m2) + (2*v2*m2)/(m1+m2)
+                        //v2 = (2*v1*m1)/(m1+m2) - (v2*(m1-m2))/(m1+m2)
+                        var bVelx = (balls[current].velocity.x * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) + (2 * EYE_CANDY_RADIUS * eyeCandies[i].velocity.x) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
+                        var bVely = (balls[current].velocity.y * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) + (2 * EYE_CANDY_RADIUS * eyeCandies[i].velocity.y) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
+                        var bVelz = (balls[current].velocity.z * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) + (2 * EYE_CANDY_RADIUS * eyeCandies[i].velocity.z) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
+                        var cVelx = (2 * balls[current].velocity.x * SPHERE_RADIUS) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) - (eyeCandies[i].velocity.x * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
+                        var cVely = (2 * balls[current].velocity.y * SPHERE_RADIUS) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) - (eyeCandies[i].velocity.y * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
+                        var cVelz = (2 * balls[current].velocity.z * SPHERE_RADIUS) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) - (eyeCandies[i].velocity.z * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
+                        balls[current].velocity.x = bVelx;
+                        balls[current].velocity.y = bVely;
+                        balls[current].velocity.z = bVelz;
+                        eyeCandies[i].velocity.x = cVelx;
+                        eyeCandies[i].velocity.y = cVely;
+                        eyeCandies[i].velocity.z = cVelz;
                     }
                 }
             }
