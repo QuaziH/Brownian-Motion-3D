@@ -211,7 +211,7 @@
             function displayGUI(){
                 GUI = new dat.GUI();
                 var param = {
-                    controls: function() {
+                    keys: function() {
                         alert("H: Hides the controller" + "\n" + "Z: Enables and disables zoom" + "\n" + "P: Enables and disables pan" + "\n" + "R: Enables and disables rotation" + "\n" + "M: Enables FullScreen");
                     },
                     candyVisible: true,
@@ -220,7 +220,7 @@
                     spheresColor: "#0000ff"
                 };
 
-                GUI.add(param, 'controls').name("Key Controls");
+                GUI.add(param, 'keys').name("Key Controls");
 
                 //Folder for candy controls
                 var candy = GUI.addFolder("Bigger Particle");
