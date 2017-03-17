@@ -142,7 +142,7 @@
                     current.velocity.setZ(-current.velocity.z);
             }
 
-            //Check to see if the spheres intersects with each other
+            //Check to see if the spheres distance is less than both their radius combined which indicates they intersected
             function intersects(sphere, other) {
                 var x1 = sphere.position.x;
                 var x2 = other.position.x;
@@ -161,19 +161,19 @@
                 return (distance < (sphere.geometry.parameters.radius + other.geometry.parameters.radius));
             }
 
-            //Look for any collision between spheres; if there are any, swap their velocity
+            //Look for any collisions between spheres and if there is apply elastic collision
             function checkSphereCollision(current) {
                 for(var i = current + 1; i < balls.length; i++) {
                     if(intersects(balls[current], balls[i])) {
-                        //Used elastic head-on collision formula
+                        //Used elastic collision formula
                         //v1 = (v1*(m1-m2))/(m1+m2) + (2*v2*m2)/(m1+m2)
                         //v2 = (2*v1*m1)/(m1+m2) - (v2*(m1-m2))/(m1+m2)
-                        var bVelx = (balls[current].velocity.x * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS) + (2 * SPHERE_MASS * balls[i].velocity.x) / (SPHERE_MASS + SPHERE_MASS);
-                        var bVely = (balls[current].velocity.y * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS) + (2 * SPHERE_MASS * balls[i].velocity.y) / (SPHERE_MASS + SPHERE_MASS);
-                        var bVelz = (balls[current].velocity.z * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS) + (2 * SPHERE_MASS * balls[i].velocity.z) / (SPHERE_MASS + SPHERE_MASS);
-                        var b2Velx = (2 * balls[current].velocity.x * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS) - (balls[i].velocity.x * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS);
-                        var b2Vely = (2 * balls[current].velocity.y * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS) - (balls[i].velocity.y * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS);
-                        var b2Velz = (2 * balls[current].velocity.z * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS) - (balls[i].velocity.z * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS);
+                        var bVelx = (2 * SPHERE_MASS * balls[i].velocity.x) / (SPHERE_MASS + SPHERE_MASS);
+                        var bVely = (2 * SPHERE_MASS * balls[i].velocity.y) / (SPHERE_MASS + SPHERE_MASS);
+                        var bVelz = (2 * SPHERE_MASS * balls[i].velocity.z) / (SPHERE_MASS + SPHERE_MASS);
+                        var b2Velx = (2 * balls[current].velocity.x * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS);
+                        var b2Vely = (2 * balls[current].velocity.y * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS);
+                        var b2Velz = (2 * balls[current].velocity.z * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS);
                         balls[current].velocity.x = bVelx;
                         balls[current].velocity.y = bVely;
                         balls[current].velocity.z = bVelz;
@@ -184,11 +184,11 @@
                 }
             }
 
-            //Look for any collision between sphere and big sphere
-            function checkCandyCollision(current) {
+            //Look for any collisions between sphere and big sphere and if there is apply elastic collision
+            function checkCandySphereCollision(current) {
                 for(var i = 0; i < eyeCandies.length; i++) {
                     if(intersects(balls[current], eyeCandies[i])) {
-                        //Used elastic head-on collision formula
+                        //Used elastic collision formula
                         //v1 = (v1*(m1-m2))/(m1+m2) + (2*v2*m2)/(m1+m2)
                         //v2 = (2*v1*m1)/(m1+m2) - (v2*(m1-m2))/(m1+m2)
                         var bVelx = (balls[current].velocity.x * (SPHERE_MASS - EYE_CANDY_MASS)) / (EYE_CANDY_MASS + SPHERE_MASS) + (2 * EYE_CANDY_MASS * eyeCandies[i].velocity.x) / (SPHERE_MASS + EYE_CANDY_MASS);
@@ -283,7 +283,7 @@
                     balls[i].position.add(balls[i].velocity);
                     checkWallBoundaries(balls[i]);
                     checkSphereCollision(i);
-                    checkCandyCollision(i);
+                    checkCandySphereCollision(i);
                 }
 
                 //checks to see if the big sphere collided with the wall
