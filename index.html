@@ -18,11 +18,13 @@
 
             var DIMENSIONS = 200;
 
-            var SPHERE_RADIUS = 2.0;
+            var SPHERE_RADIUS = 2;
+            var SPHERE_MASS = 2.0;
             var amountOfSpheres = 500;
             var balls = [];
 
-            var EYE_CANDY_RADIUS = 8.0;
+            var EYE_CANDY_RADIUS = 8;
+            var EYE_CANDY_MASS = 8.0;
             var amountOfEyeCandies = 1;
             var eyeCandies = [];
 
@@ -166,12 +168,12 @@
                         //Used elastic head-on collision formula
                         //v1 = (v1*(m1-m2))/(m1+m2) + (2*v2*m2)/(m1+m2)
                         //v2 = (2*v1*m1)/(m1+m2) - (v2*(m1-m2))/(m1+m2)
-                        var bVelx = (balls[current].velocity.x * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS) + (2 * SPHERE_RADIUS * balls[i].velocity.x) / (SPHERE_RADIUS + SPHERE_RADIUS);
-                        var bVely = (balls[current].velocity.y * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS) + (2 * SPHERE_RADIUS * balls[i].velocity.y) / (SPHERE_RADIUS + SPHERE_RADIUS);
-                        var bVelz = (balls[current].velocity.z * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS) + (2 * SPHERE_RADIUS * balls[i].velocity.z) / (SPHERE_RADIUS + SPHERE_RADIUS);
-                        var b2Velx = (2 * balls[current].velocity.x * SPHERE_RADIUS) / (SPHERE_RADIUS + SPHERE_RADIUS) - (balls[i].velocity.x * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS);
-                        var b2Vely = (2 * balls[current].velocity.y * SPHERE_RADIUS) / (SPHERE_RADIUS + SPHERE_RADIUS) - (balls[i].velocity.y * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS);
-                        var b2Velz = (2 * balls[current].velocity.z * SPHERE_RADIUS) / (SPHERE_RADIUS + SPHERE_RADIUS) - (balls[i].velocity.z * (SPHERE_RADIUS - SPHERE_RADIUS)) / (SPHERE_RADIUS + SPHERE_RADIUS);
+                        var bVelx = (balls[current].velocity.x * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS) + (2 * SPHERE_MASS * balls[i].velocity.x) / (SPHERE_MASS + SPHERE_MASS);
+                        var bVely = (balls[current].velocity.y * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS) + (2 * SPHERE_MASS * balls[i].velocity.y) / (SPHERE_MASS + SPHERE_MASS);
+                        var bVelz = (balls[current].velocity.z * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS) + (2 * SPHERE_MASS * balls[i].velocity.z) / (SPHERE_MASS + SPHERE_MASS);
+                        var b2Velx = (2 * balls[current].velocity.x * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS) - (balls[i].velocity.x * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS);
+                        var b2Vely = (2 * balls[current].velocity.y * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS) - (balls[i].velocity.y * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS);
+                        var b2Velz = (2 * balls[current].velocity.z * SPHERE_MASS) / (SPHERE_MASS + SPHERE_MASS) - (balls[i].velocity.z * (SPHERE_MASS - SPHERE_MASS)) / (SPHERE_MASS + SPHERE_MASS);
                         balls[current].velocity.x = bVelx;
                         balls[current].velocity.y = bVely;
                         balls[current].velocity.z = bVelz;
@@ -189,12 +191,12 @@
                         //Used elastic head-on collision formula
                         //v1 = (v1*(m1-m2))/(m1+m2) + (2*v2*m2)/(m1+m2)
                         //v2 = (2*v1*m1)/(m1+m2) - (v2*(m1-m2))/(m1+m2)
-                        var bVelx = (balls[current].velocity.x * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) + (2 * EYE_CANDY_RADIUS * eyeCandies[i].velocity.x) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
-                        var bVely = (balls[current].velocity.y * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) + (2 * EYE_CANDY_RADIUS * eyeCandies[i].velocity.y) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
-                        var bVelz = (balls[current].velocity.z * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) + (2 * EYE_CANDY_RADIUS * eyeCandies[i].velocity.z) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
-                        var cVelx = (2 * balls[current].velocity.x * SPHERE_RADIUS) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) - (eyeCandies[i].velocity.x * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
-                        var cVely = (2 * balls[current].velocity.y * SPHERE_RADIUS) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) - (eyeCandies[i].velocity.y * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
-                        var cVelz = (2 * balls[current].velocity.z * SPHERE_RADIUS) / (EYE_CANDY_RADIUS + SPHERE_RADIUS) - (eyeCandies[i].velocity.z * (SPHERE_RADIUS - EYE_CANDY_RADIUS)) / (SPHERE_RADIUS + EYE_CANDY_RADIUS);
+                        var bVelx = (balls[current].velocity.x * (SPHERE_MASS - EYE_CANDY_MASS)) / (EYE_CANDY_MASS + SPHERE_MASS) + (2 * EYE_CANDY_MASS * eyeCandies[i].velocity.x) / (SPHERE_MASS + EYE_CANDY_MASS);
+                        var bVely = (balls[current].velocity.y * (SPHERE_MASS - EYE_CANDY_MASS)) / (EYE_CANDY_MASS + SPHERE_MASS) + (2 * EYE_CANDY_MASS * eyeCandies[i].velocity.y) / (SPHERE_MASS + EYE_CANDY_MASS);
+                        var bVelz = (balls[current].velocity.z * (SPHERE_MASS - EYE_CANDY_MASS)) / (EYE_CANDY_MASS + SPHERE_MASS) + (2 * EYE_CANDY_MASS * eyeCandies[i].velocity.z) / (SPHERE_MASS + EYE_CANDY_MASS);
+                        var cVelx = (2 * balls[current].velocity.x * SPHERE_MASS) / (EYE_CANDY_MASS + SPHERE_MASS) - (eyeCandies[i].velocity.x * (SPHERE_MASS - EYE_CANDY_MASS)) / (SPHERE_MASS + EYE_CANDY_MASS);
+                        var cVely = (2 * balls[current].velocity.y * SPHERE_MASS) / (EYE_CANDY_MASS + SPHERE_MASS) - (eyeCandies[i].velocity.y * (SPHERE_MASS - EYE_CANDY_MASS)) / (SPHERE_MASS + EYE_CANDY_MASS);
+                        var cVelz = (2 * balls[current].velocity.z * SPHERE_MASS) / (EYE_CANDY_MASS + SPHERE_MASS) - (eyeCandies[i].velocity.z * (SPHERE_MASS - EYE_CANDY_MASS)) / (SPHERE_MASS + EYE_CANDY_MASS);
                         balls[current].velocity.x = bVelx;
                         balls[current].velocity.y = bVely;
                         balls[current].velocity.z = bVelz;
