@@ -28,7 +28,6 @@
     "webpack-dev-server": "^2.9.3"
   },
   "dependencies": {
-    "dat.gui": "^0.6.1",
     "three": "^0.88.0",
     "three-orbit-controls": "^82.1.0",
     "three-window-resize": "^1.0.4"
