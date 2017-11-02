@@ -8,7 +8,7 @@
 
 This code is a simulation of the Brownian Motion in 3D using three.js for my physics undergraduate class. The coefficient of restitution is assumed to be at 1.0. The particles have no definition and it's speed are all random.
 
-# How to run
+## How to run
 
 ```sh
 $ cd 'name of directory where you want the files'
