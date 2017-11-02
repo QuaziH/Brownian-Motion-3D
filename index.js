@@ -1,3 +1,5 @@
+"use strict";
+
 import * as THREE from 'three';
 // import OrbitControls from 'three-orbit-controls';
 let OrbitControls = require('three-orbit-controls')(THREE);
