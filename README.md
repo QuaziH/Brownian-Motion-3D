@@ -10,6 +10,8 @@ This code is a simulation of the Brownian Motion in 3D using three.js for my phy
 
 ## How to run
 
+Make sure you have [Node.js](http://nodejs.org/) installed.
+
 ```sh
 $ cd 'name of directory where you want the files'
 $ git clone https://github.com/QuaziH/Brownian-Motion-3D.git #or clone your own fork
