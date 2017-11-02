@@ -12,7 +12,7 @@ This code is a simulation of the Brownian Motion in 3D using three.js for my phy
 
 ```sh
 $ cd 'name of directory where you want the files'
-$ git https://github.com/QuaziH/Brownian-Motion-3D.git #or clone your own fork
+$ git clone https://github.com/QuaziH/Brownian-Motion-3D.git #or clone your own fork
 $ cd Brownian-Motion-3D
 $ npm install
 $ npm run start
