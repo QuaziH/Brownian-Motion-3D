@@ -26,5 +26,3 @@ Soon to be added
 
 
 **Quazi Hossain**
-
-q.hossain@ymail.com
